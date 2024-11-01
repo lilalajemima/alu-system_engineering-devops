@@ -1,0 +1,1 @@
+These are for the basics of ehat to do with ssh
