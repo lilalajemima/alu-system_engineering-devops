@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-#This bash script redirects to another page
+#!
+# 
 apt-get -y update
 apt-get install -y nginx
 sudo chown -R "$USER":"$USER" /var/www/html
