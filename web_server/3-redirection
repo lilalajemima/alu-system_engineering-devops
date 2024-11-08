@@ -1,4 +1,4 @@
-#!//usr/bin/env bash
+#!/usr/bin/env bash
 #This bash script redirects to another page
 apt-get -y update
 apt-get install -y nginx
