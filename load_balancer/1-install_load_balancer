@@ -1,27 +1,57 @@
 #!/usr/bin/env bash
-#Updates the current state of the server
-#Installs Nginx on the server
-#Changes the user and user group ownership for editing file
-#overwrites the default page of nginx
-#overwrites the default configuration file default
-#add a redirection and a location for the redirection
-#restarts nginx
+# Create a script to install and configure HAProxy on lb-01 server
+# Configure HAProxy to send traffic to web-01 and web-02 servers
+
+# Install and configure HAproxy on my lb-01 server.
+sudo apt-get -y update
+sudo apt-get -y install haproxy
+
+# Edit config file
+server_config=\
+"
+frontend lb-frontend
+        bind *:80
+        mode http
+        default_backend lb-backend
+backend lb-backend
+        balance roundrobin
+        server web-01 54.197.130.241:80 check
+        server web-02 54.90.120.102:80 check
+"
+echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
+
+# Enable HAProxy to be started by init script
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy/
+
+# Testing the HAproxy configuration file
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+sudo service haproxy restart
+=======
+# Updates the current state of the server
+# Installs Nginx on the server
+# Changes the user and user group ownership for editing file
+# Overwrites the default page of nginx
+# Overwrites the default configuration file default
+# Adds a redirection and a location for the redirection
+# Restarts nginx
+
 apt-get -y update
 apt-get install -y nginx
 sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default
 echo "upstream servers{
-	server 52.23.202.242;
-	server 3.84.186.46;}
-	server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	location / {
-		proxy_pass http://servers;
-		proxy_set_header Host $host;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;}
+    server 54.197.130.241;
+    server 54.90.120.102;}
+    server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    location / {
+        proxy_pass http://servers;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;}
 }" > /etc/nginx/sites-available/default
 sudo chown -R root:root /etc/nginx/sites-available/default
 sudo service nginx restart
 sudo service nginx reload
+
