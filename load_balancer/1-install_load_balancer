@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#Updates the current state of the server
+#Installs Nginx on the server
+#Changes the user and user group ownership for editing file
+#overwrites the default page of nginx
+#overwrites the default configuration file default
+#add a redirection and a location for the redirection
+#restarts nginx
+apt-get -y update
+apt-get install -y nginx
+sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default
+echo "upstream servers{
+	server 52.23.202.242;
+	server 3.84.186.46;}
+	server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	location / {
+		proxy_pass http://servers;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;}
+}" > /etc/nginx/sites-available/default
+sudo chown -R root:root /etc/nginx/sites-available/default
+sudo service nginx restart
+sudo service nginx reload
