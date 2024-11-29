@@ -1,0 +1,1 @@
+For this project we debug involving wordpress and use Puppet
